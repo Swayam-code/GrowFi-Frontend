@@ -3,17 +3,17 @@
 import { usePathname } from 'next/navigation';
 import Sidebar from '@/components/layout/Sidebar';
 
-interface AnalyticsLayoutProps {
+interface SupportLayoutProps {
   children: React.ReactNode;
 }
 
-export default function AnalyticsLayout({ children }: AnalyticsLayoutProps) {
+export default function SupportLayout({ children }: SupportLayoutProps) {
   const pathname = usePathname();
   
   // Extract the active page from pathname
   const getActivePage = () => {
     const path = pathname.split('/')[1]; // Get the first segment after the slash
-    return path || 'analytics';
+    return path || 'support';
   };
   
   const activePage = getActivePage();

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { usePortfolio } from '@/context/PortfolioContext';
 
 // Mock data for portfolio
 const portfolioData = {
@@ -152,40 +153,57 @@ const portfolioData = {
   ]
 };
 
+// Define type for asset allocation
+interface AssetData {
+  name: string;
+  value: number;
+  percentage: number;
+}
+
+// Define type for platform data
+interface PlatformData {
+  name: string;
+  value: number;
+  gain: number;
+  gainPercentage: number;
+}
+
 const PortfolioSummary = ({ data }: { data: any }) => {
   return (
     <div className="bg-gradient-to-r from-blue-700 to-blue-500 rounded-xl p-6 shadow-lg text-white opacity-0 translate-y-4 animate-fade-in-up">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
         <h2 className="text-xl font-bold">Portfolio Overview</h2>
-        <button className="bg-blue-600 hover:bg-blue-800 px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
-          + Add Investment
-        </button>
+        <Link href="/trade">
+          <button className="bg-blue-600 hover:bg-blue-800 px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
+            + Add Investment
+          </button>
+        </Link>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-blue-600/50 p-4 rounded-lg">
           <p className="text-blue-100 mb-1">Total Value</p>
-          <p className="text-2xl font-bold">₹{data.totalValue.toLocaleString()}</p>
+          <p className="text-2xl font-bold">₹{data.totalValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
         </div>
         <div className="bg-blue-600/50 p-4 rounded-lg">
           <p className="text-blue-100 mb-1">Total Gain</p>
           <p className="text-2xl font-bold text-green-300">
-            +₹{data.totalGain.toLocaleString()} (+{data.gainPercentage}%)
+            +₹{data.totalGain.toLocaleString(undefined, { maximumFractionDigits: 2 })} (+{data.totalGain > 0 && (data.totalValue - data.totalGain) > 0 ? ((data.totalGain / (data.totalValue - data.totalGain)) * 100).toLocaleString(undefined, { maximumFractionDigits: 2 }) : '0.00'}%)
           </p>
         </div>
         <div className="bg-blue-600/50 p-4 rounded-lg">
           <p className="text-blue-100 mb-1">This Month</p>
-          <p className="text-2xl font-bold text-green-300">+{data.returnThisMonth}%</p>
+          <p className="text-2xl font-bold text-green-300">+{data.returnThisMonth ? Number(data.returnThisMonth).toLocaleString(undefined, { maximumFractionDigits: 2 }) : '0.00'}%</p>
         </div>
         <div className="bg-blue-600/50 p-4 rounded-lg">
           <p className="text-blue-100 mb-1">Holdings</p>
-          <p className="text-2xl font-bold">{data.totalHoldings}</p>
+          <p className="text-2xl font-bold">{data.holdings.length}</p>
         </div>
       </div>
     </div>
   );
 };
 
-const AssetAllocation = ({ data }: { data: any[] }) => {
+const AssetAllocation = ({ data }: { data: AssetData[] }) => {
   const colors = ["#3B82F6", "#A855F7", "#F59E0B", "#10B981"];
   
   return (
@@ -239,16 +257,10 @@ const AssetAllocation = ({ data }: { data: any[] }) => {
             <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: colors[index % colors.length] }}></div>
             <div>
               <p className="text-sm font-medium">{item.name}</p>
-              <p className="text-xs text-gray-500">₹{item.value.toLocaleString()} ({item.percentage}%)</p>
+              <p className="text-xs text-gray-500">₹{item.value.toLocaleString(undefined, { maximumFractionDigits: 2 })} ({Number(item.percentage).toLocaleString(undefined, { maximumFractionDigits: 1 })}%)</p>
             </div>
           </div>
         ))}
-      </div>
-      
-      <div className="mt-6">
-        <Link href="/analytics" className="text-blue-600 hover:text-blue-800 text-sm font-medium">
-          View Detailed Analytics →
-        </Link>
       </div>
     </div>
   );
@@ -264,10 +276,10 @@ const HoldingsList = ({ holdings }: { holdings: any[] }) => {
   
   return (
     <div className="mt-8 opacity-0 translate-y-4 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <h3 className="text-xl font-bold text-gray-800">Your Holdings</h3>
         
-        <div className="flex space-x-2">
+        <div className="flex flex-wrap gap-2">
           {categories.map(category => (
             <button
               key={category}
@@ -319,15 +331,15 @@ const HoldingsList = ({ holdings }: { holdings: any[] }) => {
                       {holding.type}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {holding.units.toFixed(holding.type === 'Stock' ? 0 : 3)}
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
+                    {holding.units.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 3 })}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    ₹{holding.value.toLocaleString()}
+                    ₹{holding.value.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className={`text-sm ${holding.gain >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {holding.gain >= 0 ? '+' : ''}₹{holding.gain.toLocaleString()} ({holding.gain >= 0 ? '+' : ''}{holding.gainPercentage}%)
+                      {holding.gain >= 0 ? '+' : ''}₹{holding.gain.toLocaleString(undefined, { maximumFractionDigits: 2 })} ({holding.gain >= 0 ? '+' : ''}{Number(holding.gainPercentage).toLocaleString(undefined, { maximumFractionDigits: 2 })}%)
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -337,7 +349,7 @@ const HoldingsList = ({ holdings }: { holdings: any[] }) => {
                         holding.riskLevel === 'medium' ? 'bg-yellow-500' :
                         'bg-red-500'
                       }`}></div>
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-black">
                         {holding.riskLevel.charAt(0).toUpperCase() + holding.riskLevel.slice(1)}
                       </span>
                     </div>
@@ -363,6 +375,62 @@ const HoldingsList = ({ holdings }: { holdings: any[] }) => {
 };
 
 export default function Portfolio() {
+  const { portfolioData } = usePortfolio();
+  // Calculate asset allocation data for pie chart
+  const [assetAllocationData, setAssetAllocationData] = useState<AssetData[]>([]);
+  
+  // Calculate asset allocation when portfolio data changes
+  useEffect(() => {
+    const categories: Record<string, AssetData> = {};
+    
+    // Group holdings by category
+    portfolioData.holdings.forEach(holding => {
+      if (!categories[holding.category]) {
+        categories[holding.category] = {
+          name: holding.category,
+          value: 0,
+          percentage: 0
+        };
+      }
+      categories[holding.category].value += holding.value;
+    });
+    
+    // Calculate percentages
+    const categoryData = Object.values(categories);
+    categoryData.forEach(category => {
+      category.percentage = (category.value / portfolioData.totalValue) * 100;
+    });
+    
+    setAssetAllocationData(categoryData);
+  }, [portfolioData]);
+  
+  // Format platforms data to include name, value, gain, and gainPercentage
+  const platformsData = useMemo(() => {
+    const platforms: Record<string, PlatformData> = {};
+    
+    // Group holdings by platform
+    portfolioData.holdings.forEach(holding => {
+      if (!platforms[holding.platform]) {
+        platforms[holding.platform] = {
+          name: holding.platform,
+          value: 0,
+          gain: 0,
+          gainPercentage: 0
+        };
+      }
+      platforms[holding.platform].value += holding.value;
+      platforms[holding.platform].gain += holding.gain;
+    });
+    
+    // Calculate percentages
+    const platformArray = Object.values(platforms);
+    platformArray.forEach(platform => {
+      platform.gainPercentage = platform.value !== 0 ? (platform.gain / platform.value) * 100 : 0;
+    });
+    
+    return platformArray;
+  }, [portfolioData.holdings]);
+
   useEffect(() => {
     // Add animation classes
     document.querySelectorAll('.animate-fade-in-up').forEach((el) => {
@@ -372,15 +440,23 @@ export default function Portfolio() {
     });
   }, []);
 
+  // Calculate monthly return (mocked for now)
+  const returnThisMonth = 4.2;
+
   return (
     <div className="container max-w-7xl mx-auto px-4 py-8">
-      <PortfolioSummary data={portfolioData} />
+      <PortfolioSummary 
+        data={{
+          ...portfolioData,
+          returnThisMonth
+        }} 
+      />
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
-        <AssetAllocation data={portfolioData.valueByAssetClass} />
+        <AssetAllocation data={assetAllocationData} />
         
-        <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
-          {portfolioData.platforms.map((platform, index) => (
+        <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+          {platformsData.map((platform, index) => (
             <div
               key={platform.name}
               className="bg-white rounded-xl p-5 shadow-md border border-gray-100 opacity-0 translate-y-4 animate-fade-in-up"
@@ -392,17 +468,10 @@ export default function Portfolio() {
                   Platform
                 </span>
               </div>
-              <p className="text-lg font-bold text-gray-800">₹{platform.value.toLocaleString()}</p>
+              <p className="text-lg font-bold text-gray-800">₹{platform.value.toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
               <p className={`text-sm ${platform.gain > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {platform.gain > 0 ? '+' : ''}₹{platform.gain.toLocaleString()} ({platform.gain > 0 ? '+' : ''}{platform.gainPercentage}%)
+                {platform.gain > 0 ? '+' : ''}₹{platform.gain.toLocaleString(undefined, { maximumFractionDigits: 2 })} ({platform.gain > 0 ? '+' : ''}{platform.gainPercentage ? Number(platform.gainPercentage).toLocaleString(undefined, { maximumFractionDigits: 2 }) : '0.00'}%)
               </p>
-              <div className="mt-4">
-                <Link href={`/analytics?platform=${platform.name}`}>
-                  <button className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors duration-200">
-                    View Details →
-                  </button>
-                </Link>
-              </div>
             </div>
           ))}
         </div>

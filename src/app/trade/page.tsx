@@ -192,27 +192,27 @@ const InvestmentCard = ({ investment }: InvestmentCardProps) => {
       
       <div className="mt-4 grid grid-cols-2 gap-2">
         <div>
-          <p className="text-xs text-gray-500 mb-1">Expected Return</p>
+          <p className="text-xs text-black mb-1">Expected Return</p>
           <p className="font-medium text-green-600">+{investment.returnForecast}%</p>
         </div>
         
         {investment.minInvestment && (
           <div>
-            <p className="text-xs text-gray-500 mb-1">Min. Investment</p>
+            <p className="text-xs text-black mb-1">Min. Investment</p>
             <p className="font-medium">₹{investment.minInvestment}</p>
           </div>
         )}
         
         {investment.price && (
           <div>
-            <p className="text-xs text-gray-500 mb-1">Price</p>
+            <p className="text-xs text-black mb-1">Price</p>
             <p className="font-medium">₹{investment.price}</p>
           </div>
         )}
         
         {investment.changePercent && (
           <div>
-            <p className="text-xs text-gray-500 mb-1">Today</p>
+            <p className="text-xs text-black mb-1">Today</p>
             <p className={`font-medium ${investment.changePercent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               {investment.changePercent >= 0 ? '+' : ''}{investment.changePercent}%
             </p>
@@ -221,7 +221,7 @@ const InvestmentCard = ({ investment }: InvestmentCardProps) => {
         
         {investment.popularity && (
           <div>
-            <p className="text-xs text-gray-500 mb-1">Popularity</p>
+            <p className="text-xs text-black mb-1">Popularity</p>
             <div className="flex items-center">
               <div className="w-16 h-1.5 bg-gray-200 rounded-full">
                 <div 
@@ -236,7 +236,7 @@ const InvestmentCard = ({ investment }: InvestmentCardProps) => {
         
         {investment.launchDate && (
           <div>
-            <p className="text-xs text-gray-500 mb-1">Launched</p>
+            <p className="text-xs text-black mb-1">Launched</p>
             <p className="font-medium">{investment.launchDate}</p>
           </div>
         )}
@@ -294,7 +294,7 @@ const SearchAndFilter = ({
             </div>
             <input
               type="text"
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-black"
               placeholder="Search for stocks, mutual funds, ETFs..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -363,10 +363,10 @@ export default function Trade() {
       {searchTerm ? (
         <div className="mt-8 opacity-0 translate-y-4 animate-fade-in-up">
           <h2 className="text-xl font-bold text-gray-800 mb-4">Search Results</h2>
-          <p className="text-gray-600">Showing results for "{searchTerm}"</p>
+          <p className="text-black">Showing results for "{searchTerm}"</p>
           
           <div className="mt-4 bg-white rounded-xl p-6 shadow-md">
-            <p className="text-center text-gray-500">This is a demo app with mock data. Try using the main categories below.</p>
+            <p className="text-center text-black">This is a demo app with mock data. Try using the main categories below.</p>
           </div>
         </div>
       ) : (
@@ -415,7 +415,7 @@ export default function Trade() {
             <div className="mt-8 opacity-0 translate-y-4 animate-fade-in-up">
               <h2 className="text-xl font-bold text-gray-800 mb-4">Bonds</h2>
               <div className="bg-white rounded-xl p-6 shadow-md">
-                <p className="text-center text-gray-500">No bonds are available for trading at the moment.</p>
+                <p className="text-center text-black">No bonds are available for trading at the moment.</p>
               </div>
             </div>
           )}
@@ -424,7 +424,7 @@ export default function Trade() {
             <div className="mt-8 opacity-0 translate-y-4 animate-fade-in-up">
               <h2 className="text-xl font-bold text-gray-800 mb-4">Gold</h2>
               <div className="bg-white rounded-xl p-6 shadow-md">
-                <p className="text-center text-gray-500">Gold trading will be available soon. Check back later.</p>
+                <p className="text-center text-black">Gold trading will be available soon. Check back later.</p>
               </div>
             </div>
           )}

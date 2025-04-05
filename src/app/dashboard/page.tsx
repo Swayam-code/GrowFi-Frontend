@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { usePortfolio } from '@/context/PortfolioContext';
 
 // Mock data for portfolio
 const portfolioData = {
@@ -88,39 +89,67 @@ const portfolioData = {
   ]
 };
 
+// Define types for platform and holding data display
+interface PlatformCardProps {
+  name: string;
+  value: number;
+  gain: number;
+  gainPercentage?: number;
+}
+
+interface HoldingCardProps {
+  id: string;
+  name: string;
+  type: string;
+  platform: string;
+  units: number;
+  nav: number;
+  value: number;
+  gain: number;
+  riskLevel: string;
+  expectedReturn: number;
+}
+
 // Components
-const PortfolioSummary = ({ data }: { data: any }) => {
+const PortfolioSummary = ({ totalValue, totalGain, platforms, gainPercentage }: { 
+  totalValue: number; 
+  totalGain: number; 
+  platforms: string[];
+  gainPercentage: number;
+}) => {
   return (
     <div className="bg-gradient-to-r from-blue-700 to-blue-500 rounded-xl p-6 shadow-lg text-white opacity-0 translate-y-4 animate-fade-in-up">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
         <h2 className="text-xl font-bold">Portfolio Summary</h2>
-        <button className="bg-blue-600 hover:bg-blue-800 px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
-          + Add Investment
-        </button>
+        <Link href="/trade">
+          <button className="bg-blue-600 hover:bg-blue-800 px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
+            + Add Investment
+          </button>
+        </Link>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
         <div className="bg-blue-600/50 p-4 rounded-lg">
           <p className="text-blue-100 mb-1">Total Value</p>
-          <p className="text-2xl font-bold">₹{data.totalValue.toLocaleString()}</p>
+          <p className="text-2xl font-bold">₹{totalValue.toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
         </div>
         <div className="bg-blue-600/50 p-4 rounded-lg">
           <p className="text-blue-100 mb-1">Total Gain</p>
           <p className="text-2xl font-bold text-green-300">
-            +₹{data.totalGain.toLocaleString()} (+{data.gainPercentage}%)
+            +₹{totalGain.toLocaleString(undefined, { maximumFractionDigits: 2 })} (+{Number(gainPercentage).toLocaleString(undefined, { maximumFractionDigits: 2 })}%)
           </p>
         </div>
         <div className="bg-blue-600/50 p-4 rounded-lg">
           <p className="text-blue-100 mb-1">Platforms</p>
-          <p className="text-xl font-bold">{data.platforms.length}</p>
+          <p className="text-xl font-bold">{platforms.length}</p>
         </div>
       </div>
     </div>
   );
 };
 
-const PlatformCards = ({ platforms }: { platforms: any[] }) => {
+const PlatformCards = ({ platforms }: { platforms: PlatformCardProps[] }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mt-8">
       {platforms.map((platform, index) => (
         <div
           key={platform.name}
@@ -133,22 +162,28 @@ const PlatformCards = ({ platforms }: { platforms: any[] }) => {
               Platform
             </span>
           </div>
-          <p className="text-lg font-bold text-gray-800">₹{platform.value.toLocaleString()}</p>
+          <p className="text-lg font-bold text-gray-800">₹{platform.value.toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
           <p className={`text-sm ${platform.gain > 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {platform.gain > 0 ? '+' : ''}₹{platform.gain.toLocaleString()} ({platform.gain > 0 ? '+' : ''}{platform.gainPercentage}%)
+            {platform.gain > 0 ? '+' : ''}₹{platform.gain.toLocaleString(undefined, { maximumFractionDigits: 2 })} ({platform.gain > 0 ? '+' : ''}{platform.gainPercentage ? Number(platform.gainPercentage).toLocaleString(undefined, { maximumFractionDigits: 2 }) : '0.00'}%)
           </p>
-          <div className="mt-4">
-            <button className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors duration-200">
-              View Details →
-            </button>
-          </div>
         </div>
       ))}
     </div>
   );
 };
 
-const HoldingCard = ({ holding, index }: { holding: any; index: number }) => {
+const HoldingCard = ({ 
+  id, 
+  name, 
+  value, 
+  gain, 
+  riskLevel, 
+  expectedReturn,
+  type,
+  platform,
+  units,
+  nav
+}: HoldingCardProps) => {
   // Function to get risk level color
   const getRiskColor = (level: string) => {
     switch(level) {
@@ -160,89 +195,82 @@ const HoldingCard = ({ holding, index }: { holding: any; index: number }) => {
   };
 
   return (
-    <div
-      className="bg-white rounded-xl p-5 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-200 opacity-0 translate-y-4 animate-fade-in-up"
-      style={{ animationDelay: `${200 + index * 100}ms` }}
-    >
+    <div className="bg-white rounded-xl p-4 shadow-md border border-gray-100 opacity-0 translate-y-4 animate-fade-in-up">
       <div className="flex justify-between items-start">
         <div>
-          <h3 className="font-bold text-blue-800">{holding.name}</h3>
+          <h3 className="font-bold text-blue-800">{name}</h3>
           <div className="flex items-center mt-1 space-x-2">
             <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
-              {holding.type}
+              {type}
             </span>
             <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">
-              {holding.platform}
+              {platform}
             </span>
           </div>
         </div>
         <div className="flex items-center">
-          <div className={`h-3 w-3 rounded-full ${getRiskColor(holding.riskLevel)} mr-1`}></div>
-          <span className="text-xs font-medium">{holding.riskLevel.charAt(0).toUpperCase() + holding.riskLevel.slice(1)} Risk</span>
+          <div className={`h-3 w-3 rounded-full ${getRiskColor(riskLevel)} mr-1`}></div>
+          <span className="text-xs font-medium">{riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1)} Risk</span>
         </div>
       </div>
       
-      <div className="mt-4 grid grid-cols-2 gap-2">
+      <div className="mt-4 grid grid-cols-4 gap-3">
         <div>
-          <p className="text-xs text-gray-500">Units</p>
-          <p className="font-medium">{holding.units.toFixed(3)}</p>
+          <p className="text-xs text-black">Units</p>
+          <p className="font-medium">{units.toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 })}</p>
         </div>
         <div>
-          <p className="text-xs text-gray-500">NAV/Price</p>
-          <p className="font-medium">₹{holding.nav.toFixed(2)}</p>
+          <p className="text-xs text-black">NAV/Price</p>
+          <p className="font-medium">₹{nav.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
         </div>
         <div>
-          <p className="text-xs text-gray-500">Value</p>
-          <p className="font-medium">₹{holding.value.toLocaleString()}</p>
+          <p className="text-xs text-black">Value</p>
+          <p className="font-medium">₹{value.toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
         </div>
         <div>
-          <p className="text-xs text-gray-500">Gain</p>
-          <p className={`font-medium ${holding.gain > 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {holding.gain > 0 ? '+' : ''}₹{holding.gain.toLocaleString()}
+          <p className="text-xs text-black">Gain</p>
+          <p className={`font-medium ${gain > 0 ? 'text-green-600' : 'text-red-600'}`}>
+            {gain > 0 ? '+' : ''}₹{gain.toLocaleString(undefined, { maximumFractionDigits: 2 })}
           </p>
         </div>
       </div>
       
-      <div className="mt-4 bg-blue-50 p-3 rounded-lg">
-        <div className="flex justify-between mb-1">
-          <p className="text-xs font-medium text-blue-700">ML Insights</p>
+      <div className="mt-4 flex justify-between text-gray-700">
+        <div>
+          <p className="text-xs mb-1">Trust Score</p>
           <div className="flex">
             {[1, 2, 3, 4, 5].map((star) => (
               <span key={star} className="text-yellow-400 text-xs">
-                {star <= Math.floor(holding.trustScore) ? '★' : '☆'}
-                {star === Math.floor(holding.trustScore) && 
-                  holding.trustScore % 1 >= 0.5 && '½'}
+                {star <= Math.floor(4.5) ? '★' : '☆'}
+                {star === Math.floor(4.5) && 4.5 % 1 >= 0.5 && '½'}
               </span>
             ))}
           </div>
         </div>
         <p className="text-xs text-blue-800">
-          Expected Return: <span className="font-medium">{holding.returnForecast}%</span>
+          Expected Return: <span className="font-medium">{expectedReturn}%</span>
         </p>
       </div>
       
       <div className="mt-4 flex space-x-2">
-        <Link href={`/trade/${holding.id}`} className="flex-1">
+        <Link href={`/trade/${id}`} className="flex-1">
           <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-lg text-sm transition-colors duration-200">
             Trade
           </button>
         </Link>
-        <Link href={`/compare?ids=${holding.id}`} className="flex-1">
+        <Link href={`/compare?ids=${id}`} className="flex-1">
           <button className="w-full border border-blue-600 text-blue-600 hover:bg-blue-50 py-2 px-3 rounded-lg text-sm transition-colors duration-200">
             Compare
           </button>
         </Link>
-        <button className="border border-blue-600 text-blue-600 hover:bg-blue-50 p-2 rounded-lg text-sm transition-colors duration-200">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
-          </svg>
-        </button>
       </div>
     </div>
   );
 };
 
 export default function Dashboard() {
+  const { portfolioData } = usePortfolio();
+
   useEffect(() => {
     // Add animation classes
     document.querySelectorAll('.animate-fade-in-up').forEach((el, i) => {
@@ -252,18 +280,58 @@ export default function Dashboard() {
     });
   }, []);
 
+  // Calculate total gain percentage
+  const gainPercentage = useMemo(() => {
+    return portfolioData.totalValue > 0 
+      ? (portfolioData.totalGain / portfolioData.totalValue) * 100 
+      : 0;
+  }, [portfolioData.totalGain, portfolioData.totalValue]);
+
+  // Format platforms data
+  const platformsData = useMemo(() => {
+    const platforms: Record<string, PlatformCardProps> = {};
+    
+    // Group holdings by platform
+    portfolioData.holdings.forEach(holding => {
+      if (!platforms[holding.platform]) {
+        platforms[holding.platform] = {
+          name: holding.platform,
+          value: 0,
+          gain: 0,
+          gainPercentage: 0
+        };
+      }
+      platforms[holding.platform].value += holding.value;
+      platforms[holding.platform].gain += holding.gain;
+    });
+    
+    // Calculate gain percentages
+    Object.values(platforms).forEach(platform => {
+      platform.gainPercentage = platform.value > 0 
+        ? (platform.gain / platform.value) * 100 
+        : 0;
+    });
+    
+    return Object.values(platforms);
+  }, [portfolioData.holdings]);
+
   return (
-    <div className="container mx-auto">
+    <div className="w-full max-w-5xl mx-auto px-4 py-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-4">Dashboard</h1>
         <p className="text-gray-600">Welcome back! Here's an overview of your investments.</p>
       </div>
       
-      <PortfolioSummary data={portfolioData} />
+      <PortfolioSummary 
+        totalValue={portfolioData.totalValue} 
+        totalGain={portfolioData.totalGain} 
+        platforms={portfolioData.platforms} 
+        gainPercentage={gainPercentage}
+      />
       
       <div className="mt-8">
         <h2 className="text-xl font-bold text-gray-800 mb-4">Your Platforms</h2>
-        <PlatformCards platforms={portfolioData.platforms} />
+        <PlatformCards platforms={platformsData} />
       </div>
       
       <div className="mt-8">
@@ -275,9 +343,21 @@ export default function Dashboard() {
             </Link>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {portfolioData.holdings.map((holding, index) => (
-            <HoldingCard key={holding.id} holding={holding} index={index} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          {portfolioData.holdings.map((holding) => (
+            <HoldingCard 
+              key={holding.id} 
+              id={holding.id.toString()} 
+              name={holding.name} 
+              value={holding.value} 
+              gain={holding.gain}
+              riskLevel={holding.riskLevel} 
+              expectedReturn={8.5}
+              type={holding.type}
+              platform={holding.platform}
+              units={holding.units}
+              nav={holding.nav}
+            />
           ))}
         </div>
       </div>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
+import { usePortfolio } from '@/context/PortfolioContext';
 
 // Mock data for investments
 const investmentsData = [
@@ -91,20 +92,20 @@ interface TradeInfoProps {
 
 const TradeInfo = ({ item, tradeType }: TradeInfoProps) => {
   return (
-    <div className="bg-white rounded-xl p-6 shadow-md opacity-0 translate-y-4 animate-fade-in-up">
+    <div className="bg-white rounded-xl p-6 shadow-md">
       <div className="flex justify-between items-start">
         <div>
-          <div className="flex items-center">
-            <h1 className="text-xl font-bold text-gray-800 mr-2">{item.name}</h1>
+          <h2 className="text-xl font-bold text-gray-800">{item?.name || 'Investment'}</h2>
+          <div className="flex items-center mt-1">
             <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-              item.type === 'Mutual Fund' 
+              item?.type === 'Mutual Fund' 
                 ? 'bg-blue-100 text-blue-700' 
                 : 'bg-purple-100 text-purple-700'
             }`}>
-              {item.type}
+              {item?.type || 'Investment'}
             </span>
           </div>
-          <p className="text-sm text-gray-500 mt-1">Via {item.platform}</p>
+          <p className="text-sm text-black mt-1">Via {item?.platform || 'N/A'}</p>
         </div>
         <div className="flex flex-col items-end">
           <div className="bg-blue-50 px-3 py-1 rounded-lg">
@@ -117,53 +118,53 @@ const TradeInfo = ({ item, tradeType }: TradeInfoProps) => {
       
       <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div className="bg-gray-50 p-3 rounded-lg">
-          <p className="text-xs text-gray-500 mb-1">Current NAV/Price</p>
-          <p className="font-medium">₹{item.nav.toFixed(2)}</p>
+          <p className="text-xs text-black mb-1">Current NAV/Price</p>
+          <p className="font-medium">₹{item?.nav ? Number(item.nav).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}</p>
         </div>
         
         {tradeType === 'sell' && (
           <div className="bg-gray-50 p-3 rounded-lg">
-            <p className="text-xs text-gray-500 mb-1">Your Units</p>
-            <p className="font-medium">{item.units.toFixed(3)}</p>
+            <p className="text-xs text-black mb-1">Your Units</p>
+            <p className="font-medium">{item?.units ? Number(item.units).toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 }) : '0.000'}</p>
           </div>
         )}
         
         <div className="bg-gray-50 p-3 rounded-lg">
-          <p className="text-xs text-gray-500 mb-1">Expected Return</p>
-          <p className="font-medium text-green-600">+{item.returnForecast}%</p>
+          <p className="text-xs text-black mb-1">Expected Return</p>
+          <p className="font-medium text-green-600">+{item?.returnForecast || '0.00'}%</p>
         </div>
         
-        {item.type === 'Mutual Fund' && (
+        {item?.type === 'Mutual Fund' && (
           <div className="bg-gray-50 p-3 rounded-lg">
-            <p className="text-xs text-gray-500 mb-1">Minimum Investment</p>
-            <p className="font-medium">₹{item.minInvestment}</p>
+            <p className="text-xs text-black mb-1">Minimum Investment</p>
+            <p className="font-medium">₹{item?.minInvestment || '0.00'}</p>
           </div>
         )}
         
-        {item.type === 'Stock' && (
+        {item?.type === 'Stock' && (
           <div className="bg-gray-50 p-3 rounded-lg">
-            <p className="text-xs text-gray-500 mb-1">Lot Size</p>
-            <p className="font-medium">{item.lotSize}</p>
+            <p className="text-xs text-black mb-1">Lot Size</p>
+            <p className="font-medium">{item?.lotSize || '1'}</p>
           </div>
         )}
         
         <div className="bg-gray-50 p-3 rounded-lg">
-          <p className="text-xs text-gray-500 mb-1">Risk Level</p>
+          <p className="text-xs text-black mb-1">Risk Level</p>
           <div className="flex items-center">
             <div className={`h-2 w-2 rounded-full mr-1 ${
-              item.riskLevel === 'low' ? 'bg-green-500' :
-              item.riskLevel === 'medium' ? 'bg-yellow-500' :
+              item?.riskLevel === 'low' ? 'bg-green-500' :
+              item?.riskLevel === 'medium' ? 'bg-yellow-500' :
               'bg-red-500'
             }`}></div>
-            <p className="font-medium">{item.riskLevel.charAt(0).toUpperCase() + item.riskLevel.slice(1)}</p>
+            <p className="font-medium">{item?.riskLevel ? item.riskLevel.charAt(0).toUpperCase() + item.riskLevel.slice(1) : 'Medium'}</p>
           </div>
         </div>
       </div>
       
-      {tradeType === 'buy' && item.type === 'Mutual Fund' && (
+      {tradeType === 'buy' && item?.type === 'Mutual Fund' && (
         <div className="mt-4 p-3 bg-yellow-50 rounded-lg border border-yellow-100">
           <p className="text-xs text-yellow-700">
-            <span className="font-medium">Exit Load:</span> {item.exitLoad}
+            <span className="font-medium">Exit Load:</span> {item?.exitLoad || 'N/A'}
           </p>
         </div>
       )}
@@ -217,7 +218,7 @@ const TradeForm = ({
       } else if (parseFloat(amount) <= 0) {
         newErrors.amount = 'Amount must be greater than 0';
         isValid = false;
-      } else if (item.type === 'Mutual Fund' && parseFloat(amount) < item.minInvestment) {
+      } else if (item.type === 'Mutual Fund' && item.minInvestment && parseFloat(amount) < item.minInvestment) {
         newErrors.amount = `Minimum investment is ₹${item.minInvestment}`;
         isValid = false;
       }
@@ -228,10 +229,10 @@ const TradeForm = ({
       } else if (parseFloat(units) <= 0) {
         newErrors.units = 'Units must be greater than 0';
         isValid = false;
-      } else if (tradeType === 'sell' && parseFloat(units) > item.units) {
+      } else if (tradeType === 'sell' && item.units && parseFloat(units) > item.units) {
         newErrors.units = `You only have ${item.units.toFixed(3)} units`;
         isValid = false;
-      } else if (item.type === 'Stock' && parseFloat(units) % item.lotSize !== 0) {
+      } else if (item.type === 'Stock' && item.lotSize && parseFloat(units) % item.lotSize !== 0) {
         newErrors.units = `Units must be in multiples of ${item.lotSize}`;
         isValid = false;
       }
@@ -261,26 +262,22 @@ const TradeForm = ({
       <form onSubmit={handleSubmit}>
         {/* Trade Options */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Trade by</label>
-          <div className="flex space-x-2">
+          <div className="flex justify-between items-center mb-2">
+            <label htmlFor="tradeBy" className="block text-sm font-medium text-black">
+              Trade By
+            </label>
+          </div>
+          <div className="flex">
             <button
               type="button"
-              className={`flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-colors duration-200 ${
-                tradeBy === 'amount' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
+              className={`flex-1 py-2 px-3 text-sm font-medium ${tradeBy === 'amount' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-black'}`}
               onClick={() => setTradeBy('amount')}
             >
-              Amount (₹)
+              Amount
             </button>
             <button
               type="button"
-              className={`flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-colors duration-200 ${
-                tradeBy === 'units' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
+              className={`flex-1 py-2 px-3 text-sm font-medium ${tradeBy === 'units' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-black'}`}
               onClick={() => setTradeBy('units')}
             >
               Units
@@ -290,31 +287,38 @@ const TradeForm = ({
         
         {/* Amount Input */}
         {tradeBy === 'amount' && (
-          <div className="mb-4">
-            <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-2">
-              Enter Amount
+          <div className="mb-6">
+            <label htmlFor="amount" className="block text-sm font-medium text-black mb-2">
+              {tradeType === 'buy' ? 'Investment Amount' : 'Redemption Amount'}
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <span className="text-gray-500">₹</span>
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <span className="text-black">₹</span>
               </div>
               <input
                 type="number"
                 id="amount"
-                placeholder="0.00"
+                className="block w-full pl-8 pr-12 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-black"
+                placeholder="Enter amount"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className={`w-full pl-8 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
-                  errors.amount ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
-                }`}
               />
+              {tradeType === 'buy' && (
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                  <button 
+                    type="button" 
+                    className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                    onClick={() => item.minInvestment && setAmount(item.minInvestment.toString())}
+                  >
+                    Min
+                  </button>
+                </div>
+              )}
             </div>
-            {errors.amount && (
-              <p className="mt-1 text-sm text-red-600">{errors.amount}</p>
-            )}
-            {amount && !errors.amount && (
-              <p className="mt-1 text-sm text-gray-500">
-                Estimated Units: <span className="font-medium">{estimatedUnits.toFixed(3)}</span>
+            {errors.amount && <p className="mt-1 text-sm text-red-600">{errors.amount}</p>}
+            {estimatedUnits > 0 && (
+              <p className="mt-2 text-sm text-black">
+                Estimated Units: {estimatedUnits.toFixed(3)}
               </p>
             )}
           </div>
@@ -322,26 +326,22 @@ const TradeForm = ({
         
         {/* Units Input */}
         {tradeBy === 'units' && (
-          <div className="mb-4">
-            <label htmlFor="units" className="block text-sm font-medium text-gray-700 mb-2">
-              Enter Units
+          <div className="mb-6">
+            <label htmlFor="units" className="block text-sm font-medium text-black mb-2">
+              Number of Units
             </label>
             <input
               type="number"
               id="units"
-              placeholder="0.000"
+              className="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-black"
+              placeholder="Enter units"
               value={units}
               onChange={(e) => setUnits(e.target.value)}
-              className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
-                errors.units ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
-              }`}
             />
-            {errors.units && (
-              <p className="mt-1 text-sm text-red-600">{errors.units}</p>
-            )}
-            {units && !errors.units && (
-              <p className="mt-1 text-sm text-gray-500">
-                Estimated Value: <span className="font-medium">₹{estimatedValue.toFixed(2)}</span>
+            {errors.units && <p className="mt-1 text-sm text-red-600">{errors.units}</p>}
+            {estimatedValue > 0 && (
+              <p className="mt-2 text-sm text-black">
+                Estimated Value: ₹{estimatedValue.toFixed(2)}
               </p>
             )}
           </div>
@@ -350,37 +350,37 @@ const TradeForm = ({
         {/* SIP Option (only for buy and mutual funds) */}
         {tradeType === 'buy' && item.type === 'Mutual Fund' && item.sipEnabled && (
           <div className="mb-6">
-            <div className="flex items-center mb-2">
+            <div className="flex items-center">
               <input
-                type="checkbox"
                 id="sip"
-                checked={isSIP}
-                onChange={(e) => setIsSIP(e.target.checked)}
+                type="checkbox"
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                checked={isSIP}
+                onChange={() => setIsSIP(!isSIP)}
               />
-              <label htmlFor="sip" className="ml-2 block text-sm font-medium text-gray-700">
-                Set up as SIP (Systematic Investment Plan)
+              <label htmlFor="sip" className="ml-2 block text-sm text-black">
+                Set up SIP (Systematic Investment Plan)
               </label>
             </div>
             
             {isSIP && (
-              <div className="mt-3 bg-blue-50 p-4 rounded-lg">
-                <label className="block text-sm font-medium text-blue-700 mb-2">
-                  SIP Frequency
+              <div className="mt-3 pl-6">
+                <label htmlFor="frequency" className="block text-sm font-medium text-black mb-2">
+                  Frequency
                 </label>
                 <select
+                  id="frequency"
+                  className="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-black"
                   value={sipFrequency}
                   onChange={(e) => setSipFrequency(e.target.value)}
-                  className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
                   <option value="monthly">Monthly</option>
                   <option value="quarterly">Quarterly</option>
-                  <option value="semiannually">Semi-Annually</option>
-                  <option value="annually">Annually</option>
                 </select>
-                
-                <p className="mt-3 text-sm text-blue-700">
-                  Your account will be debited ₹{amount || '0'} {sipFrequency} until canceled.
+                <p className="mt-2 text-sm text-black">
+                  Your account will be debited ₹{amount || '0'} every {sipFrequency === 'daily' ? 'day' : sipFrequency}
                 </p>
               </div>
             )}
@@ -450,131 +450,265 @@ const OrderSuccess = ({
   );
 };
 
-export default function Trade() {
-  const params = useParams();
+export default function TradePage({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const [investment, setInvestment] = useState<any>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [tradeType, setTradeType] = useState<'buy' | 'sell'>('buy');
-  const [orderPlaced, setOrderPlaced] = useState<boolean>(false);
-
+  const { portfolioData, executeTrade } = usePortfolio();
+  const [tradeType, setTradeType] = useState<string>('buy');
+  const [units, setUnits] = useState<string>('');
+  const [price, setPrice] = useState<string>('');
+  const [processing, setProcessing] = useState<boolean>(false);
+  const [processingStatus, setProcessingStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [error, setError] = useState<string | null>(null);
+  const [marketPrice, setMarketPrice] = useState<number | null>(null);
+  
+  // Find the holding from portfolio data
+  const holding = portfolioData.holdings.find(h => h.id.toString() === params.id);
+  
+  // Get market price on load
   useEffect(() => {
-    // Simulate API call to fetch investment data
-    fetchInvestment();
+    if (holding) {
+      // Simulate market price with some variation (in a real app, this would be an API call)
+      const variation = (Math.random() * 0.04) - 0.02; // -2% to +2%
+      const simulatedPrice = holding.nav * (1 + variation);
+      setMarketPrice(simulatedPrice);
+      setPrice(simulatedPrice.toFixed(2));
+    }
+  }, [holding]);
+  
+  // Reset error when inputs change
+  useEffect(() => {
+    if (error) {
+      setError(null);
+    }
+  }, [units, price, tradeType]);
+  
+  const handleUnitsChange = (value: string) => {
+    // Only allow numeric input with up to 3 decimal places
+    if (value === '' || /^\d*\.?\d{0,3}$/.test(value)) {
+      setUnits(value);
+    }
+  };
+  
+  const handlePriceChange = (value: string) => {
+    // Only allow numeric input with up to 2 decimal places
+    if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+      setPrice(value);
+    }
+  };
+  
+  const handleUseMarketPrice = () => {
+    if (marketPrice) {
+      setPrice(marketPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+    }
+  };
+  
+  const validateInputs = (): boolean => {
+    if (!units || parseFloat(units) <= 0) {
+      setError('Please enter a valid number of units.');
+      return false;
+    }
     
-    // Initialize animations
-    setTimeout(() => {
-      document.querySelectorAll('.animate-fade-in-up').forEach((el, i) => {
+    if (!price || parseFloat(price) <= 0) {
+      setError('Please enter a valid price.');
+      return false;
+    }
+    
+    if (tradeType === 'sell' && holding && parseFloat(units) > holding.units) {
+      setError(`You cannot sell more than ${Number(holding.units).toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 })} units.`);
+      return false;
+    }
+    
+    return true;
+  };
+  
+  const handleSubmit = () => {
+    if (validateInputs()) {
+      setProcessing(true);
+      setError(null);
+      
+      try {
+        const success = executeTrade({
+          id: parseInt(params.id),
+          units: parseFloat(units),
+          tradeType: tradeType as 'buy' | 'sell',
+          price: parseFloat(price)
+        });
+        
+        if (success) {
+          setProcessingStatus('success');
+          setTimeout(() => {
+            router.push('/portfolio');
+          }, 1500);
+        } else {
+          setProcessingStatus('error');
+          setError('Failed to execute trade. Please try again.');
+          setTimeout(() => {
+            setProcessing(false);
+            setProcessingStatus('idle');
+          }, 1500);
+        }
+      } catch (err) {
+        setProcessingStatus('error');
+        setError('There was an error processing your transaction. Please try again.');
         setTimeout(() => {
-          el.classList.remove('opacity-0', 'translate-y-4');
-        }, i * 100);
-      });
-    }, 100);
-  }, [params.id]);
-
-  const fetchInvestment = () => {
-    setLoading(true);
-    // Simulate API call delay
-    setTimeout(() => {
-      const found = investmentsData.find(item => item.id === params.id);
-      setInvestment(found || null);
-      setLoading(false);
-    }, 500);
+          setProcessing(false);
+          setProcessingStatus('idle');
+        }, 1500);
+      }
+    }
   };
-
-  const handleTradeTypeChange = (type: 'buy' | 'sell') => {
-    setTradeType(type);
-  };
-
-  if (loading) {
+  
+  // If holding not found
+  if (!holding) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="h-20 bg-gray-200 animate-pulse rounded-xl mb-4"></div>
-          <div className="h-64 bg-gray-200 animate-pulse rounded-xl mb-4"></div>
-          <div className="h-96 bg-gray-200 animate-pulse rounded-xl"></div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!investment) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto bg-white rounded-xl p-8 shadow-md text-center">
-          <div className="bg-red-100 p-4 rounded-full mx-auto w-20 h-20 flex items-center justify-center mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">Investment Not Found</h1>
-          <p className="text-gray-600 mb-6">The investment you're looking for doesn't exist or has been removed.</p>
-          <Link href="/dashboard">
-            <span className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200">
-              Return to Dashboard
-            </span>
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="bg-white rounded-xl p-6 shadow-md text-center">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">Investment Not Found</h2>
+          <p className="text-gray-600 mb-6">The investment you are looking for does not exist or has been removed.</p>
+          <Link href="/portfolio">
+            <button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors duration-200">
+              Return to Portfolio
+            </button>
           </Link>
         </div>
       </div>
     );
   }
-
+  
   return (
-    <div className="container mx-auto">
-      <div className="mb-6">
-        <Link href="/dashboard">
-          <span className="text-blue-600 hover:text-blue-800 font-medium flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to Dashboard
-          </span>
-        </Link>
-      </div>
-      
-      <div className="max-w-4xl mx-auto">
-        {/* Trading Tabs */}
-        <div className="bg-white rounded-xl p-3 shadow-md mb-6 flex opacity-0 translate-y-4 animate-fade-in-up">
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-gray-800">{tradeType === 'buy' ? 'Buy' : 'Sell'} {holding.name}</h1>
+        <div className="flex space-x-2">
           <button
-            className={`flex-1 py-2 rounded-lg text-center font-medium transition-colors duration-200 ${
+            type="button"
+            className={`py-2 px-4 rounded-lg text-sm font-medium transition-colors duration-200 ${
               tradeType === 'buy' 
                 ? 'bg-blue-600 text-white' 
-                : 'text-gray-600 hover:bg-gray-100'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
-            onClick={() => handleTradeTypeChange('buy')}
+            onClick={() => setTradeType('buy')}
           >
             Buy
           </button>
           <button
-            className={`flex-1 py-2 rounded-lg text-center font-medium transition-colors duration-200 ${
+            type="button"
+            className={`py-2 px-4 rounded-lg text-sm font-medium transition-colors duration-200 ${
               tradeType === 'sell' 
                 ? 'bg-blue-600 text-white' 
-                : 'text-gray-600 hover:bg-gray-100'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
-            onClick={() => handleTradeTypeChange('sell')}
+            onClick={() => setTradeType('sell')}
           >
             Sell
           </button>
         </div>
+      </div>
+      
+      <TradeInfo item={holding} tradeType={tradeType as 'buy' | 'sell'} />
+      
+      <div className="bg-white rounded-xl p-6 shadow-md mt-6">
+        <h2 className="text-lg font-bold text-gray-800 mb-4">Trade Details</h2>
         
-        {/* Order confirmation */}
-        {orderPlaced ? (
-          <OrderSuccess item={investment} tradeType={tradeType} />
-        ) : (
-          <>
-            {/* Investment info */}
-            <TradeInfo item={investment} tradeType={tradeType} />
-            
-            {/* Trade form */}
-            <div className="mt-6">
-              <TradeForm 
-                item={investment} 
-                tradeType={tradeType}
-                setOrderPlaced={setOrderPlaced}
-              />
-            </div>
-          </>
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-lg">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
         )}
+        
+        <div className="mb-4">
+          <label htmlFor="units" className="block text-sm font-medium text-gray-700 mb-1">Units</label>
+          <div className="relative rounded-md shadow-sm">
+            <input
+              type="text"
+              id="units"
+              className="block w-full pr-20 sm:text-sm border-gray-300 rounded-md py-2 px-3 border focus:ring-blue-500 focus:border-blue-500 text-black"
+              placeholder="0.000"
+              value={units}
+              onChange={(e) => handleUnitsChange(e.target.value)}
+              disabled={processing}
+            />
+            <div className="absolute inset-y-0 right-0 flex items-center">
+              <button
+                type="button"
+                className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-blue-600 hover:text-blue-800 focus:outline-none mx-2"
+                onClick={() => {
+                  if (holding && tradeType === 'sell') {
+                    handleUnitsChange(holding.units.toString());
+                  }
+                }}
+                disabled={processing || tradeType !== 'sell'}
+              >
+                Use max ({Number(holding.units).toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 })})
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div className="mb-4">
+          <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">Price per Unit (₹)</label>
+          <div className="relative rounded-md shadow-sm">
+            <input
+              type="text"
+              id="price"
+              className="block w-full pr-20 sm:text-sm border-gray-300 rounded-md py-2 px-3 border focus:ring-blue-500 focus:border-blue-500 text-black"
+              placeholder="0.00"
+              value={price}
+              onChange={(e) => handlePriceChange(e.target.value)}
+              disabled={processing}
+            />
+            <div className="absolute inset-y-0 right-0 flex items-center">
+              <button
+                type="button"
+                className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-blue-600 hover:text-blue-800 focus:outline-none mx-2"
+                onClick={handleUseMarketPrice}
+                disabled={processing}
+              >
+                Use market price (₹{marketPrice ? Number(marketPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : 'Loading...'})
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-gray-50 p-3 rounded-lg mb-6">
+          <div className="flex justify-between items-center">
+            <p className="text-sm text-gray-700">Total Value:</p>
+            <p className="text-lg font-bold text-gray-900">
+              ₹{units && price ? (parseFloat(units) * parseFloat(price)).toLocaleString(undefined, { maximumFractionDigits: 2 }) : '0.00'}
+            </p>
+          </div>
+        </div>
+        
+        <div className="flex justify-center">
+          <button
+            type="button"
+            className={`w-full py-3 px-4 rounded-lg text-base font-medium text-white transition-all duration-200 ${
+              processing 
+                ? 'bg-gray-400 cursor-not-allowed' 
+                : 'bg-blue-600 hover:bg-blue-700 hover:shadow-md'
+            }`}
+            onClick={handleSubmit}
+            disabled={processing}
+          >
+            {processing ? (
+              <div className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {processingStatus === 'success' ? 'Order Placed!' : processingStatus === 'error' ? 'Failed' : 'Processing...'}
+              </div>
+            ) : (
+              `Place ${tradeType === 'buy' ? 'Buy' : 'Sell'} Order`
+            )}
+          </button>
+        </div>
+        
+        <div className="mt-4 text-center">
+          <Link href="/portfolio" className="text-sm text-gray-500 hover:text-blue-600 transition-colors">
+            Cancel and return to portfolio
+          </Link>
+        </div>
       </div>
     </div>
   );

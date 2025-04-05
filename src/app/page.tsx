@@ -1,8 +1,40 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
+  const [activeFaqIndex, setActiveFaqIndex] = useState<number | null>(null);
+
+  const toggleFaq = (index: number) => {
+    setActiveFaqIndex(activeFaqIndex === index ? null : index);
+  };
+
+  // FAQ items data
+  const faqItems = [
+    {
+      question: "How does GrowFi connect to my investment accounts?",
+      answer: "GrowFi uses secure API connections with industry-standard encryption to safely link to your investment platforms. We use read-only access by default, meaning we can never make transactions without your explicit permission."
+    },
+    {
+      question: "Is my financial data secure with GrowFi?",
+      answer: "Absolutely. We employ bank-level security measures including 256-bit encryption, two-factor authentication, and regular security audits. Your data is encrypted both in transit and at rest, and we never share your information with third parties without your consent."
+    },
+    {
+      question: "What investment platforms does GrowFi support?",
+      answer: "GrowFi currently supports major platforms including Zerodha, Groww, Angel One, Upstox, MF Central, Kuvera, and more. We're constantly adding support for additional platforms based on user requests."
+    },
+    {
+      question: "How does the AI recommendation system work?",
+      answer: "Our AI analyzes your portfolio composition, historical performance, risk profile, and market trends to provide personalized recommendations. The system considers factors like diversification, tax efficiency, and alignment with your financial goals to suggest optimizations."
+    },
+    {
+      question: "Does GrowFi offer a free trial?",
+      answer: "Yes! GrowFi offers a 14-day free trial with full access to all features. No credit card is required to start your trial, and you can upgrade to a paid plan anytime if you decide to continue using our service."
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-white overflow-hidden">
       {/* Header */}
@@ -47,10 +79,13 @@ export default function Home() {
         <div className="container mx-auto max-w-7xl relative z-10">
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 md:pr-16">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6 opacity-0 animate-fade-in-up">
-                <span className="block opacity-0 animate-slide-in-left delay-200">Unify</span>
-                <span className="block opacity-0 animate-slide-in-left delay-300">& Optimize</span>
-                <span className="block bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent opacity-0 animate-slide-in-left delay-400">Your Investments</span>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
+                <div className="mb-2 opacity-0 animate-slide-in-left delay-200">
+                  <span className="block bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Unify & Optimize</span>
+                </div>
+                <div className="opacity-0 animate-slide-in-left delay-400">
+                  <span className="block bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">Your Investments</span>
+                </div>
               </h1>
               <p className="text-lg text-gray-600 mb-8 max-w-lg opacity-0 animate-fade-in-up delay-500">
                 Professional portfolio management across multiple platforms. Make data-driven investment decisions powered by AI insights.
@@ -110,68 +145,68 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-20 px-4 overflow-hidden">
+      {/* Features Section - Improved */}
+      <section id="features" className="py-20 px-4 bg-gradient-to-b from-white to-blue-50 overflow-hidden">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16 opacity-0 animate-fade-in-up">
             <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">
-              The Modern Platform for Modern Investors
+              Modern Tools for Modern Investors
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              GrowFi brings together your investment accounts, provides analytical tools, and offers AI-powered insights to maximize your returns.
+            <p className="text-lg text-gray-800 max-w-2xl mx-auto">
+              GrowFi combines all your investment accounts into one powerful dashboard with AI-powered tools to maximize your returns.
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
-                title: 'Complete Portfolio View',
-                description: 'Integrate your investment accounts from multiple platforms for a comprehensive overview of your entire portfolio.',
+                title: 'All-in-One Portfolio',
+                description: 'Seamlessly integrate and manage all your investments from Zerodha, MF Central, and other platforms in a single dashboard.',
                 icon: (
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
                 ),
-                features: ['Zerodha', 'MF Central', 'Angel One'],
+                features: ['Real-time portfolio tracking', 'Investment consolidation', 'Multi-platform support'],
                 delay: '100ms'
               },
               {
-                title: 'Data-Driven Insights',
-                description: 'Get advanced analytics and visualizations to understand performance, risks, and opportunities in your portfolio.',
+                title: 'Advanced Analytics',
+                description: 'Get detailed visual insights into your investment performance, risk assessment, and asset allocation to make informed decisions.',
                 icon: (
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 ),
-                features: ['Performance Metrics', 'Risk Assessment', 'Sector Analysis'],
+                features: ['Performance comparison', 'Risk visualization', 'Historical analysis'],
                 delay: '300ms'
               },
               {
-                title: 'AI-Powered Recommendations',
-                description: 'Leverage machine learning algorithms that analyze your portfolio and suggest optimizations to maximize returns.',
+                title: 'AI Recommendations',
+                description: 'Receive personalized investment suggestions and portfolio optimization guidance based on your goals and risk tolerance.',
                 icon: (
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 ),
-                features: ['Investment Suggestions', 'Portfolio Rebalancing', 'SIP Optimization'],
+                features: ['Smart rebalancing', 'Tax-efficient strategies', 'Goal-based planning'],
                 delay: '500ms'
               }
             ].map((feature, index) => (
               <div 
                 key={index} 
-                className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 opacity-0 animate-fade-in-up hover:shadow-lg transition-all duration-500 transform hover:-translate-y-2"
+                className="bg-white p-8 rounded-xl shadow-md border border-gray-100 opacity-0 animate-fade-in-up hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
                 style={{ animationDelay: feature.delay }}
               >
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg flex items-center justify-center mb-5">
+                <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
                   {feature.icon}
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-3">{feature.title}</h3>
-                <p className="text-gray-600 mb-4">{feature.description}</p>
-                <ul className="space-y-2">
+                <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
+                <p className="text-gray-800 mb-6 leading-relaxed">{feature.description}</p>
+                <ul className="space-y-3">
                   {feature.features.map((item) => (
-                    <li key={item} className="flex items-center text-sm text-gray-600">
-                      <svg className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <li key={item} className="flex items-center text-sm text-gray-800">
+                      <svg className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       {item}
@@ -184,8 +219,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Dashboard Preview Section */}
-      <section id="analytics" className="py-24 px-4 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+      {/* Support Section */}
+      <section className="py-24 px-4 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
         <div className="absolute inset-0 z-0 opacity-80">
           <div className="absolute bottom-40 right-20 w-96 h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-float"></div>
           <div className="absolute top-20 left-0 w-72 h-72 bg-indigo-100 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-float" style={{ animationDelay: "3s" }}></div>
@@ -198,8 +233,8 @@ export default function Home() {
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl blur opacity-30 animate-pulse-slow"></div>
                 <div className="bg-white rounded-xl shadow-xl overflow-hidden relative z-10">
                   <img 
-                    src="https://images.unsplash.com/photo-1535957998253-26ae1ef29506?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80" 
-                    alt="GrowFi Analytics" 
+                    src="https://images.unsplash.com/photo-1579389083078-4e7018379f7e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" 
+                    alt="GrowFi Support" 
                     className="w-full h-auto"
                   />
                 </div>
@@ -207,17 +242,17 @@ export default function Home() {
             </div>
             <div className="order-1 md:order-2 opacity-0 animate-slide-in-right delay-300">
               <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-6">
-                Advanced Analytics at Your Fingertips
+                24/7 Support When You Need It
               </h2>
               <p className="text-lg text-gray-600 mb-8">
-                Interactive charts and visualizations help you understand your portfolio performance and make better investment decisions.
+                Our dedicated support team is always ready to assist you with any questions or concerns about your investments.
               </p>
               <ul className="space-y-4">
                 {[
-                  'Real-time performance tracking across all platforms',
-                  'Detailed breakdown by asset class, sector, and risk level',
-                  'Historical trends and comparison with benchmarks',
-                  'Future projections based on historical data'
+                  'Expert advice from certified financial advisors',
+                  'Multiple support channels including chat, email, and phone',
+                  'Comprehensive help resources and FAQs',
+                  'Community forums to connect with other investors'
                 ].map((feature, index) => (
                   <li key={index} className="flex items-start opacity-0 animate-fade-in" style={{ animationDelay: `${400 + index * 100}ms` }}>
                     <span className="flex items-center justify-center h-6 w-6 rounded-full bg-blue-100 text-blue-600 mr-3 mt-0.5">
@@ -408,6 +443,66 @@ export default function Home() {
             </Link>
             <Link href="/dashboard" className="px-8 py-3 bg-blue-700 text-white rounded-lg text-sm font-medium border border-blue-300 hover:bg-blue-800 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1">
               View Live Demo
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section - Interactive */}
+      <section className="py-20 px-4 bg-gradient-to-b from-blue-50 to-white">
+        <div className="container mx-auto max-w-4xl">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-lg text-gray-800 max-w-2xl mx-auto">
+              Everything you need to know about GrowFi to get started
+            </p>
+          </div>
+          
+          <div className="space-y-4">
+            {faqItems.map((faq, index) => (
+              <div 
+                key={index} 
+                className={`bg-white rounded-xl shadow-sm overflow-hidden transition-all duration-300 ${activeFaqIndex === index ? 'ring-2 ring-blue-200 shadow-md' : 'hover:shadow-md'}`}
+              >
+                <button
+                  onClick={() => toggleFaq(index)}
+                  className="w-full px-6 py-5 text-left flex justify-between items-center hover:bg-blue-50 transition-colors duration-200 focus:outline-none"
+                  aria-expanded={activeFaqIndex === index}
+                >
+                  <h3 className={`text-lg font-semibold ${activeFaqIndex === index ? 'text-blue-700' : 'text-gray-900'}`}>
+                    {faq.question}
+                  </h3>
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300 ${activeFaqIndex === index ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-500'}`}>
+                    <svg 
+                      className={`w-5 h-5 transform transition-transform duration-300 ${activeFaqIndex === index ? 'rotate-180' : ''}`} 
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </button>
+                <div 
+                  className={`overflow-hidden transition-all duration-300 ease-in-out ${activeFaqIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
+                >
+                  <div className="px-6 pb-5 pt-2 border-t border-gray-100">
+                    <p className="text-gray-700 leading-relaxed">{faq.answer}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="mt-12 text-center">
+            <p className="text-gray-700 mb-4">Still have questions?</p>
+            <Link href="/support" className="inline-flex items-center text-blue-600 font-medium hover:text-blue-800 transition-colors">
+              Contact our support team
+              <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
             </Link>
           </div>
         </div>

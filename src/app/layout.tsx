@@ -1,12 +1,14 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
+import './globals.css';
+import { Inter } from 'next/font/google';
+import { PortfolioProvider } from '@/context/PortfolioContext';
+import { GeminiProvider } from '@/context/GeminiContext';
+import ChatBot from '@/components/ChatBot';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
-export const metadata: Metadata = {
-  title: "GrowFi - Smart Investment Dashboard",
-  description: "A modern investment tracking and analysis platform with AI insights and portfolio management features.",
+export const metadata = {
+  title: 'GrowFi - Unify & Optimize Your Investments',
+  description: 'Track, analyze, and optimize your investments across all platforms',
 };
 
 export default function RootLayout({
@@ -17,7 +19,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        {children}
+        <PortfolioProvider>
+          <GeminiProvider>
+            {children}
+            <ChatBot />
+          </GeminiProvider>
+        </PortfolioProvider>
       </body>
     </html>
   );
