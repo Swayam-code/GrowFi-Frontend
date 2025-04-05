@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GrowFi - Investment Portfolio Manager
+
+GrowFi is a modern web application built with Next.js, TypeScript, and Tailwind CSS that helps users manage and optimize their investment portfolios across multiple platforms including Zerodha, MF Central, and Angel One.
+
+## Features
+
+- **Unified Dashboard**: View all your investments in one place with detailed analytics
+- **AI-Powered Insights**: Get personalized recommendations and risk assessments
+- **Portfolio Comparison**: Compare different funds and stocks side by side
+- **Trade Execution**: Buy, sell, or set up SIPs directly from the platform
+- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
+
+## Technology Stack
+
+- **Frontend**: Next.js 14, TypeScript, Tailwind CSS
+- **UI Animations**: CSS Transitions and Animations
+- **Authentication**: JWT-based authentication (simulated for demo)
+- **Deployment**: Vercel (recommended)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 18.17 or later
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/growfi.git
+   cd growfi
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+3. Run the development server:
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+4. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+
+## Project Structure
+
+```
+growfi/
+├── public/             # Static assets
+├── src/
+│   ├── app/            # Next.js app router
+│   │   ├── compare/    # Fund comparison page
+│   │   ├── dashboard/  # Main portfolio dashboard
+│   │   ├── login/      # Authentication pages
+│   │   ├── signup/     # User registration
+│   │   ├── trade/      # Buy/Sell execution
+│   │   ├── layout.tsx  # Root layout
+│   │   └── page.tsx    # Landing page
+│   ├── components/     # Reusable UI components
+│   └── styles/         # Global styles
+├── tailwind.config.ts  # Tailwind CSS configuration
+└── next.config.ts      # Next.js configuration
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Demo Access
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Use the following credentials to access the demo:
+- **Email**: demo@example.com
+- **Password**: any password will work
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Planned Features
 
-## Learn More
+- Real API integration with financial platforms
+- User profile management and preferences
+- Advanced portfolio analysis with historical data
+- Mobile app version with React Native
 
-To learn more about Next.js, take a look at the following resources:
+## Contributing
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## License
 
-## Deploy on Vercel
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Acknowledgments
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Financial data is simulated for demonstration purposes
+- Icons provided by Heroicons
