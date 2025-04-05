@@ -550,7 +550,7 @@ type Props = {
 
 export default function TradePage({ params }: Props) {
   const router = useRouter();
-  const id = params.id as string;
+  const id = params.id;
   const { portfolioData, executeTrade } = usePortfolio();
   const [tradeType, setTradeType] = useState<string>("buy");
   const [units, setUnits] = useState<string>("");
