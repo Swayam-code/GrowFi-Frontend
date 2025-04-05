@@ -23,6 +23,7 @@ GrowFi is a modern web application built with Next.js, TypeScript, and Tailwind 
 
 - Node.js 18.17 or later
 - npm or yarn
+- pnpm
 
 ### Installation
 
