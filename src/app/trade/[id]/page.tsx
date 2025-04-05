@@ -542,15 +542,16 @@ const OrderSuccess = ({
   );
 };
 
-type Props = {
-  params: {
-    id: string;
-  };
-};
-
-export default function TradePage({ params }: Props) {
+export default function TradePage() {
   const router = useRouter();
-  const id = params.id;
+  const params = useParams();
+  const id =
+    typeof params.id === "string"
+      ? params.id
+      : Array.isArray(params.id)
+      ? params.id[0]
+      : "";
+
   const { portfolioData, executeTrade } = usePortfolio();
   const [tradeType, setTradeType] = useState<string>("buy");
   const [units, setUnits] = useState<string>("");
