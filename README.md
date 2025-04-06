@@ -6,7 +6,7 @@ GrowFi is a modern web application built with Next.js, TypeScript, and Tailwind 
 
 - **Unified Dashboard**: View all your investments in one place with detailed analytics
 - **AI-Powered Insights**: Get personalized recommendations and risk assessments
-- **Portfolio Comparison**: Compare different funds and stocks side by side
+- **Portfolio Comparison**: Compare different funds and stocks side by side with an expanded dataset of 90+ Indian stocks and mutual funds
 - **Trade Execution**: Buy, sell, or set up SIPs directly from the platform
 - **Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
 
@@ -14,6 +14,7 @@ GrowFi is a modern web application built with Next.js, TypeScript, and Tailwind 
 
 - **Frontend**: Next.js 14, TypeScript, Tailwind CSS
 - **UI Animations**: CSS Transitions and Animations
+- **Data**: Comprehensive Indian stock and mutual fund data (both real and simulated)
 - **Authentication**: JWT-based authentication (simulated for demo)
 - **Deployment**: Vercel (recommended)
 
@@ -29,8 +30,8 @@ GrowFi is a modern web application built with Next.js, TypeScript, and Tailwind 
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/growfi.git
-   cd growfi
+   git clone https://github.com/Swayam-code/GrowFi-Frontend.git
+   cd GrowFi-Frontend
    ```
 
 2. Install dependencies:
@@ -52,22 +53,44 @@ GrowFi is a modern web application built with Next.js, TypeScript, and Tailwind 
 ## Project Structure
 
 ```
-growfi/
-├── public/             # Static assets
+GrowFi-Frontend/
+├── public/                     # Static assets
+│   ├── mutual_fund_data.json   # Comprehensive mutual fund dataset
+│   ├── stock_data.json         # Indian stock market data
+│   └── ...                     # Icons and other assets
 ├── src/
-│   ├── app/            # Next.js app router
-│   │   ├── compare/    # Fund comparison page
-│   │   ├── dashboard/  # Main portfolio dashboard
-│   │   ├── login/      # Authentication pages
-│   │   ├── signup/     # User registration
-│   │   ├── trade/      # Buy/Sell execution
-│   │   ├── layout.tsx  # Root layout
-│   │   └── page.tsx    # Landing page
-│   ├── components/     # Reusable UI components
-│   └── styles/         # Global styles
-├── tailwind.config.ts  # Tailwind CSS configuration
-└── next.config.ts      # Next.js configuration
+│   ├── app/                    # Next.js app router
+│   │   ├── compare/            # Fund comparison page
+│   │   ├── dashboard/          # Main portfolio dashboard
+│   │   ├── login/              # Authentication pages
+│   │   ├── signup/             # User registration
+│   │   ├── trade/              # Buy/Sell execution
+│   │   ├── layout.tsx          # Root layout
+│   │   └── page.tsx            # Landing page
+│   ├── components/             # Reusable UI components
+│   └── styles/                 # Global styles
+├── fetch_fmp_stocks.js         # Script to fetch and generate Indian stock data
+├── tailwind.config.ts          # Tailwind CSS configuration
+└── next.config.ts              # Next.js configuration
 ```
+
+## Data Assets
+
+The application includes comprehensive data for financial analysis:
+
+- **Indian Stocks**: 90+ stocks across large cap, mid cap, and small cap segments with detailed metrics
+- **Mutual Funds**: Large dataset of mutual funds with performance history, ratings, and fund manager details
+- **Comparison Tools**: Advanced filtering and side-by-side comparison capabilities
+
+### Expanding the Dataset
+
+To add more financial data, you can run the included data fetching script:
+
+```bash
+node fetch_fmp_stocks.js
+```
+
+This will attempt to fetch real-time data for Indian stocks or generate realistic mock data when API data isn't available.
 
 ## Demo Access
 
@@ -96,5 +119,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Acknowledgments
 
-- Financial data is simulated for demonstration purposes
+- Financial data is both real (when available) and simulated for demonstration purposes
 - Icons provided by Heroicons
+- Uses Financial Modeling Prep API for some market data
