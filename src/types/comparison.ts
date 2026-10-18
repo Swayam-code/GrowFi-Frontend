@@ -57,12 +57,17 @@ export interface InvestmentOption extends Partial<ExtendedMarketData>, Partial<S
 }
 
 // Comparison metric structure
-export interface ComparisonMetric {
+export type ComparisonMetric = {
   id: string;
   label: string;
-  isHeader?: boolean;
+  isHeader: true;
   category?: string;
-}
+} | {
+  id: keyof InvestmentOption;
+  label: string;
+  isHeader?: false;
+  category?: string;
+};
 
 // Interface for a grouped set of comparison items
 export interface ComparisonGroup {

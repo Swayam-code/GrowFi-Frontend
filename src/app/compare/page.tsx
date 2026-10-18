@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { usePortfolio } from '@/context/PortfolioContext';
@@ -114,7 +114,7 @@ const ComparisonTable = ({ data, visibleSections }: { data: InvestmentOption[]; 
     );
   }
 
-  const getBestInvestment = (metricId: string, data: InvestmentOption[]) => {
+  const getBestInvestment = (metricId: keyof InvestmentOption, data: InvestmentOption[]) => {
     if (metricId === 'maxDrawdown') {
       // For max drawdown, smaller (less negative) is better
       return data.reduce((prev, current) => {
@@ -122,7 +122,7 @@ const ComparisonTable = ({ data, visibleSections }: { data: InvestmentOption[]; 
         const currVal = typeof current[metricId] === 'string' ? parseFloat(current[metricId]?.replace('%', '') || '0') : (current[metricId] || 0);
         return currVal > prevVal ? current : prev;
       });
-    } else if (['expense', 'volatility'].includes(metricId)) {
+    } else if (metricId === 'expense' || metricId === 'volatility') {
       // For these metrics, lower is better
       return data.reduce((prev, current) => {
         return (current[metricId] || 0) < (prev[metricId] || 0) ? current : prev;
@@ -130,12 +130,15 @@ const ComparisonTable = ({ data, visibleSections }: { data: InvestmentOption[]; 
     } else {
       // For other metrics, higher is better
       return data.reduce((prev, current) => {
-        return (current[metricId] || 0) > (prev[metricId] || 0) ? current : prev;
+        const currentValue = current[metricId] || 0;
+        const previousValue = prev[metricId] || 0;
+        return (typeof currentValue === 'boolean' ? Number(currentValue) : currentValue) >
+          (typeof previousValue === 'boolean' ? Number(previousValue) : previousValue) ? current : prev;
       });
     }
   };
 
-  const renderMetricValue = (metricId: string, item: InvestmentOption) => {
+  const renderMetricValue = (metricId: keyof InvestmentOption, item: InvestmentOption) => {
     let value = item[metricId];
     let bestItem = getBestInvestment(metricId, data);
     let isBest = bestItem.id === item.id && data.length > 1;
@@ -274,7 +277,7 @@ const ComparisonTable = ({ data, visibleSections }: { data: InvestmentOption[]; 
   );
 };
 
-export default function Compare() {
+function CompareContent() {
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [availableInvestments, setAvailableInvestments] = useState<InvestmentOption[]>([]);
   const [visibleSections, setVisibleSections] = useState<SectionVisibility>({
@@ -505,4 +508,11 @@ export default function Compare() {
       </div>
     </main>
   );
-} 
+}
+export default function Compare() {
+  return (
+    <Suspense fallback={<p className="p-6 text-gray-500">Loading comparison...</p>}>
+      <CompareContent />
+    </Suspense>
+  );
+}

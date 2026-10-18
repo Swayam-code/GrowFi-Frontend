@@ -50,12 +50,12 @@ export default function Settings() {
     setAccountForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleNotificationChange = (category: 'email' | 'mobile', setting: string) => {
+  const handleNotificationChange = <Category extends keyof typeof notifications,>(category: Category, setting: keyof (typeof notifications)[Category]) => {
     setNotifications(prev => ({
       ...prev,
       [category]: {
         ...prev[category],
-        [setting]: !prev[category][setting as keyof typeof prev[category]]
+        [setting]: !prev[category][setting]
       }
     }));
   };
@@ -310,13 +310,13 @@ export default function Settings() {
                   <div>
                     <h3 className="text-lg font-medium text-gray-900">Email Notifications</h3>
                     <div className="mt-4 space-y-3">
-                      {Object.entries(notifications.email).map(([key, value]) => (
+                      {(Object.keys(notifications.email) as (keyof typeof notifications.email)[]).map((key) => (
                         <div key={key} className="flex items-center">
                           <input
                             id={`email-${key}`}
                             name={`email-${key}`}
                             type="checkbox"
-                            checked={value}
+                            checked={notifications.email[key]}
                             onChange={() => handleNotificationChange('email', key)}
                             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                           />
@@ -331,13 +331,13 @@ export default function Settings() {
                   <div className="border-t border-gray-200 pt-6">
                     <h3 className="text-lg font-medium text-gray-900">Mobile Notifications</h3>
                     <div className="mt-4 space-y-3">
-                      {Object.entries(notifications.mobile).map(([key, value]) => (
+                      {(Object.keys(notifications.mobile) as (keyof typeof notifications.mobile)[]).map((key) => (
                         <div key={key} className="flex items-center">
                           <input
                             id={`mobile-${key}`}
                             name={`mobile-${key}`}
                             type="checkbox"
-                            checked={value}
+                            checked={notifications.mobile[key]}
                             onChange={() => handleNotificationChange('mobile', key)}
                             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                           />
