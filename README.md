@@ -122,3 +122,11 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Financial data is both real (when available) and simulated for demonstration purposes
 - Icons provided by Heroicons
 - Uses Financial Modeling Prep API for some market data
+
+## Server credential setup
+
+Copy `.env.example` to `.env.local`. Configure `MARKETSTACK_API_KEY` for live stock comparisons and `GEMINI_API_KEY` for AI chat/insights in the Next.js server environment, then redeploy. Remove `NEXT_PUBLIC_GEMINI_API_KEY` from deployment settings: public environment variables are bundled into browser JavaScript. Browser code now calls fixed local API routes; neither key is sent to the browser. Routes return generic provider failures without upstream error bodies.
+
+The standalone stock-data generator reads `FMP_API_KEY` from the shell environment. It does not load `.env.local`; export that variable before running `node fetch_fmp_stocks.js`. Missing configuration stops the generator before any provider requests.
+
+Rotate the committed key used in both the Marketstack service and FMP generator in the corresponding provider account(s). Rotate any Gemini key previously deployed using `NEXT_PUBLIC_GEMINI_API_KEY`, even if it was never committed. Old Git history and published browser bundles remain exposed after this fix. The Gemini route streams at most 50 KB of JSON and limits prompts to 40,000 characters; upstream requests time out. Routes apply a modest per-instance fixed-window cap (20 AI requests/minute; 30 stock requests/minute). These limits are shared by users of one instance and reset on restart; configure deployment authentication and gateway-wide rate/usage controls before exposing paid credentials publicly.

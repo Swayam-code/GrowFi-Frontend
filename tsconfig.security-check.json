@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "incremental": false },
+  "files": ["src/app/api/gemini/route.ts", "src/app/api/stocks/route.ts", "src/services/ComparisonService.ts", "src/context/GeminiContext.tsx"],
+  "include": [],
+  "exclude": ["node_modules"]
+}
