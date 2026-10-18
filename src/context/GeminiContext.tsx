@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 import { usePortfolio } from './PortfolioContext';
 
 // Define proper types for holdings
@@ -35,27 +35,12 @@ export function GeminiProvider({ children }: { children: ReactNode }) {
   const [isProcessing, setIsProcessing] = useState(false);
   const { portfolioData } = usePortfolio();
   
-  // Get API key from environment variable
-  const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-  
-  // Log initialization of Gemini API
-  useEffect(() => {
-    if (API_KEY) {
-      console.log('Gemini API client initialized with real API key');
-    } else {
-      console.warn('Gemini API key not found in environment variables');
-    }
-  }, [API_KEY]);
-
   /**
    * Generate portfolio insights using Gemini API
    */
   const generateInsights = async (userPortfolio: PortfolioData) => {
     setIsProcessing(true);
     try {
-      if (!API_KEY) {
-        throw new Error('Gemini API key not configured');
-      }
       
       const formattedPortfolio = {
         totalValue: userPortfolio.totalValue,
@@ -76,11 +61,10 @@ export function GeminiProvider({ children }: { children: ReactNode }) {
       };
 
       // Make real API call to Gemini
-      const response = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent', {
+      const response = await fetch('/api/gemini', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-goog-api-key': API_KEY,
         },
         body: JSON.stringify({
           contents: [
@@ -180,9 +164,6 @@ export function GeminiProvider({ children }: { children: ReactNode }) {
   const generateChatResponse = async (query: string, chatHistory: any[] = []) => {
     setIsProcessing(true);
     try {
-      if (!API_KEY) {
-        throw new Error('Gemini API key not configured');
-      }
       
       // Format portfolio data to avoid sending too much info
       const formattedPortfolio = {
@@ -230,11 +211,10 @@ export function GeminiProvider({ children }: { children: ReactNode }) {
       Your response:`;
 
       // Make real API call to Gemini with simpler format
-      const response = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent', {
+      const response = await fetch('/api/gemini', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-goog-api-key': API_KEY,
         },
         body: JSON.stringify({
           contents: [

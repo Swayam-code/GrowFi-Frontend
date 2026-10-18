@@ -1,12 +1,10 @@
 import { ExtendedMarketData, InvestmentOption } from '@/types/comparison';
 
-const API_KEY = 'dW7ZovQdr3jh35yrsmZrY0X2QizDIRQM';
-const STOCK_API_BASE_URL = 'https://api.marketstack.com/v1';
 
 // Helper to fetch stock data from external API
 export async function fetchStockData(symbol: string): Promise<any> {
   try {
-    const response = await fetch(`${STOCK_API_BASE_URL}/eod?access_key=${API_KEY}&symbols=${symbol}.XNSE&limit=1`);
+    const response = await fetch(`/api/stocks?symbol=${encodeURIComponent(symbol)}`);
     if (!response.ok) {
       throw new Error('Failed to fetch stock data');
     }

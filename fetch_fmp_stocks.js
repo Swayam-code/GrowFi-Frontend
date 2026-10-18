@@ -3,7 +3,8 @@ const path = require('path');
 const https = require('https');
 
 // FMP API Key
-const API_KEY = 'dW7ZovQdr3jh35yrsmZrY0X2QizDIRQM';
+const API_KEY = process.env.FMP_API_KEY;
+if (!API_KEY) throw new Error('Set FMP_API_KEY before generating stock data');
 const stockFilePath = path.join(__dirname, 'public', 'stock_data.json');
 
 // List of Indian stocks with BSE symbols (adding .BSE to symbol)
